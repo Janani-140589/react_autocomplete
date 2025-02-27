@@ -32,7 +32,7 @@ export const AutoComplete: React.FC<Props> = ({
     <div className="dropdown-content">
       {people.map(p => (
         <div
-          key={p.name}
+          key={p.slug}
           data-value={JSON.stringify(p)}
           className="dropdown-item"
           data-cy="suggestion-item"
@@ -58,7 +58,7 @@ export const App: React.FC<{ delay?: number }> = ({ delay = 300 }) => {
 
   const filteredPeople = useMemo(() => {
     return peopleFromServer.filter(p =>
-      p.name.toLowerCase().includes(debounceQuery.toLowerCase()),
+      p.name.trim().toLowerCase().includes(debounceQuery.toLowerCase()),
     );
   }, [debounceQuery]);
 
@@ -70,6 +70,12 @@ export const App: React.FC<{ delay?: number }> = ({ delay = 300 }) => {
 
     return () => clearTimeout(timerId);
   }, [query, delay]);
+
+  function handleChange(inputquery: string) {
+    setQuery(inputquery);
+    setShowDropdown(true);
+    setPerson({} as Person);
+  }
 
   return (
     <div className="container">
@@ -89,11 +95,7 @@ export const App: React.FC<{ delay?: number }> = ({ delay = 300 }) => {
               className="input"
               data-cy="search-input"
               value={query}
-              onChange={event => {
-                setQuery(event.target.value);
-                setShowDropdown(true);
-                setPerson({} as Person);
-              }}
+              onChange={e => handleChange(e.target.value)}
             />
           </div>
           {showDropdown && filteredPeople.length > 0 && (
